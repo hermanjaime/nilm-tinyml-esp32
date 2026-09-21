@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard NILM — ESP32</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg    : #f0f2f5;
+      --card  : #ffffff;
+      --on    : #16a34a;
+      --off   : #9ca3af;
+      --warn  : #d97706;
+      --red   : #dc2626;
+      --blue  : #2563eb;
+      --text  : #1f2937;
+      --sub   : #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    header h1  { font-size: 22px; font-weight: 700; }
+    header p   { font-size: 13px; color: var(--sub); margin-top: 4px; }
+
+    /* ── Status bar ── */
+    #status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--sub);
+    }
+    #dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--off);
+      transition: background .4s;
+    }
+    #dot.online { background: var(--on); }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin: 24px 0 12px;
+    }
+
+    /* ── Device grid ── */
+    .devices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .device-card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      border-left: 5px solid var(--off);
+      transition: border-color .4s, box-shadow .4s;
+    }
+    .device-card.on {
+      border-left-color: var(--on);
+      box-shadow: 0 4px 16px rgba(22,163,74,.15);
+    }
+
+    .device-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .device-name {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--off);
+      color: white;
+      transition: background .4s;
+    }
+    .badge.on { background: var(--on); }
+
+    .device-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .metric {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .metric .label {
+      font-size: 11px;
+      color: var(--sub);
+      margin-bottom: 4px;
+    }
+    .metric .value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .metric .unit {
+      font-size: 11px;
+      color: var(--sub);
+      margin-left: 2px;
+    }
+    .metric.highlight .value { color: var(--on); }
+    .metric.off      .value { color: var(--off); }
+
+    /* Probability bar */
+    .prob-bar {
+      margin-top: 14px;
+    }
+    .prob-bar .prob-label {
+      font-size: 11px;
+      color: var(--sub);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .prob-track {
+      height: 5px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .prob-fill {
+      height: 100%;
+      background: var(--off);
+      border-radius: 999px;
+      transition: width .6s, background .4s;
+    }
+    .prob-fill.on { background: var(--on); }
+
+    /* ── Totals ── */
+    .totals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .total-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      text-align: center;
+    }
+    .total-card .t-label {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 6px;
+    }
+    .total-card .t-value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .total-card .t-unit {
+      font-size: 12px;
+      color: var(--sub);
+      margin-left: 3px;
+    }
+
+    /* ── Charts ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+    }
+    .chart-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sub);
+      margin-bottom: 12px;
+    }
+    .chart-card canvas { width: 100% !important; height: 200px !important; }
+
+    /* ── History table ── */
+    .table-card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      overflow-x: auto;
+    }
+    .table-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sub);
+      margin-bottom: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th {
+      text-align: left;
+      padding: 6px 10px;
+      color: var(--sub);
+      border-bottom: 2px solid var(--border);
+    }
+    td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    tr:last-child td { border-bottom: none; }
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .chip-on  { background: #dcfce7; color: var(--on); }
+    .chip-off { background: #f3f4f6; color: var(--sub); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Dashboard NILM — ESP32</h1>
+  <p>Non-Intrusive Load Monitoring · NILM Dataset</p>
+</header>
+
+<div id="status-bar">
+  <div id="dot"></div>
+  <span id="status-text">Waiting for data...</span>
+</div>
+
+<!-- Devices -->
+<div class="section-title">Detected devices</div>
+<div class="devices-grid" id="devices-grid">
+  <!-- populated by JS -->
+</div>
+
+<!-- Totals -->
+<div class="section-title">Instantaneous totals</div>
+<div class="totals-grid">
+  <div class="total-card">
+    <div class="t-label">Total current</div>
+    <div><span class="t-value" id="tot-current">--</span><span class="t-unit">A</span></div>
+  </div>
+  <div class="total-card">
+    <div class="t-label">Mains voltage</div>
+    <div><span class="t-value" id="tot-voltage">127</span><span class="t-unit">V</span></div>
+  </div>
+  <div class="total-card">
+    <div class="t-label">Total power</div>
+    <div><span class="t-value" id="tot-power">--</span><span class="t-unit">W</span></div>
+  </div>
+  <div class="total-card">
+    <div class="t-label">Power factor</div>
+    <div><span class="t-value" id="tot-fp">--</span></div>
+  </div>
+  <div class="total-card">
+    <div class="t-label">Accumulated energy</div>
+    <div><span class="t-value" id="tot-energy">--</span><span class="t-unit">kWh</span></div>
+  </div>
+  <div class="total-card">
+    <div class="t-label">Estimated cost</div>
+    <div><span class="t-value" id="tot-cost">--</span><span class="t-unit">R$</span></div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="section-title">History (last 60 readings)</div>
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Power by device (W)</h3>
+    <canvas id="chartPower"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Total current (A)</h3>
+    <canvas id="chartCurrent"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Accumulated cost (R$)</h3>
+    <canvas id="chartCost"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Accumulated energy (kWh)</h3>
+    <canvas id="chartEnergy"></canvas>
+  </div>
+</div>
+
+<!-- History table -->
+<div class="section-title">Latest readings</div>
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Fan</th>
+        <th>Blender</th>
+        <th>Hair dryer</th>
+        <th>Power (W)</th>
+        <th>Current (A)</th>
+        <th>Cost (R$)</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const POLL_MS    = 1500;
+const DEVICE_NAMES = ["ventilador", "liquidificador", "secador"];
+const DEVICE_COLORS = { ventilador:"#2563eb", liquidificador:"#d97706", secador:"#dc2626" };
+
+// ── State ────────────────────────────────────────────────────────────────────
+let charts = {};
+let historyData = {
+  labels   : [],
+  power    : { ventilador:[], liquidificador:[], secador:[] },
+  current  : [],
+  cost     : [],
+  energy   : [],
+};
+
+// ── Create device cards ────────────────────────────────────────────────
+function buildDeviceCards() {
+  const grid = document.getElementById("devices-grid");
+  grid.innerHTML = "";
+  DEVICE_NAMES.forEach(name => {
+    grid.innerHTML += `
+      <div class="device-card" id="card-${name}">
+        <div class="device-header">
+          <span class="device-name">${name}</span>
+          <span class="badge" id="badge-${name}">OFF</span>
+        </div>
+        <div class="device-metrics">
+          <div class="metric" id="m-power-${name}">
+            <div class="label">Power</div>
+            <div><span class="value">0</span><span class="unit">W</span></div>
+          </div>
+          <div class="metric" id="m-current-${name}">
+            <div class="label">Current</div>
+            <div><span class="value">0.000</span><span class="unit">A</span></div>
+          </div>
+          <div class="metric" id="m-voltage-${name}">
+            <div class="label">Voltage</div>
+            <div><span class="value">127</span><span class="unit">V</span></div>
+          </div>
+          <div class="metric" id="m-cost-${name}">
+            <div class="label">Session cost</div>
+            <div><span class="value">0.000000</span><span class="unit">R$</span></div>
+          </div>
+        </div>
+        <div class="prob-bar">
+          <div class="prob-label">
+            <span>MLP probability</span>
+            <span id="prob-val-${name}">0%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" id="prob-fill-${name}" style="width:0%"></div>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+// ── Create charts ────────────────────────────────────────────────────────────
+function createCharts() {
+  // Power by device (multi-line)
+  const ctxP = document.getElementById("chartPower").getContext("2d");
+  charts.power = new Chart(ctxP, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: DEVICE_NAMES.map(n => ({
+        label: n,
+        data: [],
+        borderColor: DEVICE_COLORS[n],
+        backgroundColor: DEVICE_COLORS[n] + "22",
+        tension: 0.3,
+        pointRadius: 1.5,
+        fill: true,
+      }))
+    },
+    options: {
+      responsive: true, animation: false,
+      scales: { y: { beginAtZero: true, title: { display:true, text:"W" } } }
+    }
+  });
+
+  // Total current
+  const ctxC = document.getElementById("chartCurrent").getContext("2d");
+  charts.current = new Chart(ctxC, {
+    type: "line",
+    data: { labels: [], datasets: [{
+      label: "Total current", data: [],
+      borderColor: "#7c3aed", tension: 0.3, pointRadius: 1.5
+    }]},
+    options: { responsive:true, animation:false,
+      scales: { y: { beginAtZero:true, title:{ display:true, text:"A" } } } }
+  });
+
+  // Cost
+  const ctxCo = document.getElementById("chartCost").getContext("2d");
+  charts.cost = new Chart(ctxCo, {
+    type: "line",
+    data: { labels: [], datasets: [{
+      label: "Accumulated cost", data: [],
+      borderColor: "#059669", backgroundColor: "#05966922",
+      tension: 0.3, pointRadius: 1.5, fill: true
+    }]},
+    options: { responsive:true, animation:false,
+      scales: { y: { beginAtZero:true, title:{ display:true, text:"R$" } } } }
+  });
+
+  // Energy
+  const ctxE = document.getElementById("chartEnergy").getContext("2d");
+  charts.energy = new Chart(ctxE, {
+    type: "line",
+    data: { labels: [], datasets: [{
+      label: "Accumulated energy", data: [],
+      borderColor: "#f59e0b", backgroundColor: "#f59e0b22",
+      tension: 0.3, pointRadius: 1.5, fill: true
+    }]},
+    options: { responsive:true, animation:false,
+      scales: { y: { beginAtZero:true, title:{ display:true, text:"kWh" } } } }
+  });
+}
+
+// ── Update device card ─────────────────────────────────────────────
+function updateDevice(dev) {
+  const on    = dev.active === 1;
+  const card  = document.getElementById(`card-${dev.name}`);
+  const badge = document.getElementById(`badge-${dev.name}`);
+  if (!card) return;
+
+  card.className  = "device-card" + (on ? " on" : "");
+  badge.className = "badge" + (on ? " on" : "");
+  badge.textContent = on ? "ON" : "OFF";
+
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = el.querySelector(".value");
+    if (v) v.textContent = val;
+    el.className = "metric" + (on ? " highlight" : " off");
+  };
+
+  setVal(`m-power-${dev.name}`,   on ? dev.powerW.toFixed(1)    : "0");
+  setVal(`m-current-${dev.name}`, on ? dev.currentRms.toFixed(3) : "0.000");
+  setVal(`m-voltage-${dev.name}`, dev.voltageRms.toFixed(0));
+  setVal(`m-cost-${dev.name}`,    (dev["costR$"] || 0).toFixed(6));
+
+  const prob     = Math.round((dev.prob || 0) * 100);
+  const fillEl   = document.getElementById(`prob-fill-${dev.name}`);
+  const probVal  = document.getElementById(`prob-val-${dev.name}`);
+  if (fillEl) {
+    fillEl.style.width = prob + "%";
+    fillEl.className   = "prob-fill" + (on ? " on" : "");
+  }
+  if (probVal) probVal.textContent = prob + "%";
+}
+
+// ── Update history table ────────────────────────────────────────────────
+function updateTable(data) {
+  const tbody = document.getElementById("table-body");
+  const rows = data.slice(-10).reverse();
+  tbody.innerHTML = rows.map(row => {
+    const ts = new Date(row.timestamp).toLocaleTimeString();
+    const devs = {};
+    (row.devices || []).forEach(d => devs[d.name] = d.active);
+    const tot = row.total || {};
+
+    const chip = name => {
+      const on = devs[name] === 1;
+      return `<span class="chip ${on?"chip-on":"chip-off"}">${on?"ON":"OFF"}</span>`;
+    };
+    return `<tr>
+      <td>${ts}</td>
+      <td>${chip("ventilador")}</td>
+      <td>${chip("liquidificador")}</td>
+      <td>${chip("secador")}</td>
+      <td>${(tot.powerW||0).toFixed(1)}</td>
+      <td>${(tot.currentRms||0).toFixed(3)}</td>
+      <td>${(tot.totalCost||0).toFixed(6)}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── Main polling loop ─────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const [latestRes, histRes] = await Promise.all([
+      fetch("/latest"),
+      fetch("/measurements?limit=60")
+    ]);
+
+    const latest = await latestRes.json();
+    const hist   = await histRes.json();
+
+    if (!latest) {
+      document.getElementById("status-text").textContent = "Waiting for ESP32 data...";
+      return;
+    }
+
+    // Online status
+    document.getElementById("dot").className = "online";
+    const ts = latest.clientTime || new Date(latest.timestamp).toLocaleString();
+    document.getElementById("status-text").textContent =
+      `Last reading: ${ts} · source: ${latest.source || "esp32"}`;
+
+    // Update device cards
+    (latest.devices || []).forEach(updateDevice);
+
+    // Update totals — reads the normalized 'total' field from server.js
+    const t = latest.total || {};
+    document.getElementById("tot-current").textContent = (t.currentRms||0).toFixed(3);
+    document.getElementById("tot-voltage").textContent = (t.voltageRms||127).toFixed(1);
+    document.getElementById("tot-power").textContent   = (t.powerW||0).toFixed(1);
+    document.getElementById("tot-fp").textContent      = (t.powerFactor||0).toFixed(2);
+    document.getElementById("tot-energy").textContent  = (t.energyKwh||0).toFixed(6);
+    document.getElementById("tot-cost").textContent    = (t.totalCost||0).toFixed(4);
+
+    // Update charts
+    if (Array.isArray(hist) && hist.length) {
+      const labels = hist.map(r => new Date(r.timestamp).toLocaleTimeString());
+      charts.power.data.labels = labels;
+      DEVICE_NAMES.forEach((n, ni) => {
+        charts.power.data.datasets[ni].data = hist.map(r => {
+          const d = (r.devices||[]).find(x=>x.name===n);
+          return d ? d.powerW : 0;
+        });
+      });
+      charts.power.update();
+
+      charts.current.data.labels = labels;
+      charts.current.data.datasets[0].data = hist.map(r => (r.total||{}).currentRms||0);
+      charts.current.update();
+
+      charts.cost.data.labels = labels;
+      charts.cost.data.datasets[0].data = hist.map(r => (r.total||{}).totalCost||0);
+      charts.cost.update();
+
+      charts.energy.data.labels = labels;
+      charts.energy.data.datasets[0].data = hist.map(r => (r.total||{}).energyKwh||0);
+      charts.energy.update();
+
+      updateTable(hist);
+    }
+
+  } catch (err) {
+    document.getElementById("dot").className = "";
+    document.getElementById("status-text").textContent = "Error loading data";
+    console.error(err);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildDeviceCards();
+createCharts();
+loadData();
+setInterval(loadData, POLL_MS);
+</script>
+
+</body>
+</html>
