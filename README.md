@@ -78,21 +78,21 @@ nilm-tinyml-esp32/
 │       └── dashboard.html
 │
 ├── dataset/
-│   ├── Dataset\_NILM.csv
+│   ├── Dataset\\\_NILM.csv
 │   └── Program.cs
 │
 ├── firmware/
-│   ├── NILM\_ESP32.ino
-│   └── nilm\_model.h
+│   ├── NILM\\\_ESP32.ino
+│   └── nilm\\\_model.h
 │
 ├── models/
-│   └── train\_dataset\_nilm.py
+│   └── train\\\_dataset\\\_nilm.py
 │
 ├── docs/
 │   ├── dashboard.png
-│   ├── hardware\_setup.png
-│   ├── current\_sensor\_circuit.png
-│   └── experimental\_result\_figures/
+│   ├── hardware\\\_setup.png
+│   ├── current\\\_sensor\\\_circuit.png
+│   └── experimental\\\_result\\\_figures/
 │
 ├── README.md
 ├── .gitignore
@@ -112,7 +112,7 @@ The prototype uses:
 The following diagram presents the experimental hardware configuration used in the prototype.
 
 <p align="center">
-  <img src="docs/hardware\_setup.png" width="850" alt="NILM prototype hardware setup">
+  <img src="docs/hardware\\\_setup.png" width="850" alt="NILM prototype hardware setup">
 </p>
 
 <p align="center">
@@ -132,7 +132,7 @@ Sensor calibration parameters are defined directly in the firmware and should be
 The SCT-013 current-sensor signal is conditioned before being connected to the ESP32 ADC. The conditioning stage includes the burden resistor, DC bias network, and filtering capacitors used by the prototype.
 
 <p align="center">
-  <img src="docs/current\_sensor\_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
+  <img src="docs/current\\\_sensor\\\_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
 </p>
 
 <p align="center">
@@ -164,7 +164,7 @@ dataset/Program.cs
 The generated dataset is stored in:
 
 ```text
-dataset/Dataset\_NILM.csv
+dataset/Dataset\\\_NILM.csv
 ```
 
 ## Signal Processing
@@ -209,7 +209,7 @@ The embedded model included in this repository uses the following architecture:
 The three outputs correspond to:
 
 ```text
-\[fan, blender, hair dryer]
+\\\[fan, blender, hair dryer]
 ```
 
 ### Embedded Model Results
@@ -229,7 +229,7 @@ The embedded model header reports the following hold-out results:
 The trained model parameters and normalization coefficients are stored in:
 
 ```text
-firmware/nilm\_model.h
+firmware/nilm\\\_model.h
 ```
 
 Inference is executed locally on the ESP32 using C/C++ operations, without requiring an external machine-learning runtime on the microcontroller.
@@ -302,7 +302,7 @@ mongodb://localhost:27017
 Database:
 
 ```text
-nilm\_db
+nilm\\\_db
 ```
 
 Collection:
@@ -375,19 +375,19 @@ http://localhost:3000/dashboard
 Before compiling the firmware, configure:
 
 ```cpp
-#define WIFI\_SSID     "YOUR\_WIFI\_SSID"
-#define WIFI\_PASSWORD "YOUR\_WIFI\_PASSWORD"
-#define SERVER\_URL    "http://YOUR\_SERVER\_IP:3000/measure"
+#define WIFI\\\_SSID     "YOUR\\\_WIFI\\\_SSID"
+#define WIFI\\\_PASSWORD "YOUR\\\_WIFI\\\_PASSWORD"
+#define SERVER\\\_URL    "http://YOUR\\\_SERVER\\\_IP:3000/measure"
 ```
 
-Keep `nilm\_model.h` in the same firmware project directory as `NILM\_ESP32.ino`.
+Keep `nilm\\\_model.h` in the same firmware project directory as `NILM\\\_ESP32.ino`.
 
 ### 3\. Upload the firmware
 
 Compile and upload:
 
 ```text
-firmware/NILM\_ESP32.ino
+firmware/NILM\\\_ESP32.ino
 ```
 
 to the ESP32.
@@ -403,13 +403,13 @@ Open the dashboard in a browser to monitor the system in real time.
 The Python training script is available at:
 
 ```text
-models/train\_dataset\_nilm.py
+models/train\\\_dataset\\\_nilm.py
 ```
 
-Before running the script, make sure `CSV\_PATH` points to the correct location of:
+Before running the script, make sure `CSV\\\_PATH` points to the correct location of:
 
 ```text
-dataset/Dataset\_NILM.csv
+dataset/Dataset\\\_NILM.csv
 ```
 
 The training script performs:
@@ -424,7 +424,7 @@ The training script performs:
 * Decision Tree training
 * Model evaluation
 
-> \*\*Important:\*\* `firmware/nilm\_model.h` is the embedded model used by the current prototype. Do not overwrite it with a newly generated model header unless the generated interface and numerical results have been validated against the firmware.
+> \\\*\\\*Important:\\\*\\\* `firmware/nilm\\\_model.h` is the embedded model used by the current prototype. Do not overwrite it with a newly generated model header unless the generated interface and numerical results have been validated against the firmware.
 
 ## Security
 
@@ -433,9 +433,9 @@ Wi-Fi credentials, passwords, API tokens, and private server addresses should **
 The public firmware should use placeholders such as:
 
 ```cpp
-#define WIFI\_SSID     "YOUR\_WIFI\_SSID"
-#define WIFI\_PASSWORD "YOUR\_WIFI\_PASSWORD"
-#define SERVER\_URL    "http://YOUR\_SERVER\_IP:3000/measure"
+#define WIFI\\\_SSID     "YOUR\\\_WIFI\\\_SSID"
+#define WIFI\\\_PASSWORD "YOUR\\\_WIFI\\\_PASSWORD"
+#define SERVER\\\_URL    "http://YOUR\\\_SERVER\\\_IP:3000/measure"
 ```
 
 ## Academic Context
@@ -452,5 +452,13 @@ The complete bibliographic reference can be added here after the dissertation is
 
 ## License
 
-A software license has not yet been defined for this repository.
+\## License
+
+
+
+This project is licensed under the MIT License.
+
+
+
+See the \[LICENSE](LICENSE) file for details.
 
