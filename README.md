@@ -113,7 +113,7 @@ The following diagram presents the experimental hardware configuration used in t
 
 <p align="center">
 
-&#x20; <img src="./docs/hardware\_setup.png" width="850" alt="NILM prototype hardware setup">
+&#x20; !\[NILM prototype hardware setup](./docs/hardware\_setup.png)
 
 </p>
 
