@@ -89,6 +89,10 @@ nilm-tinyml-esp32/
 │   └── train_dataset_nilm.py
 │
 ├── docs/
+│   ├── dashboard.png
+│   ├── hardware_setup.png
+│   ├── current_sensor_circuit.png
+│   └── experimental_result_figures/
 │
 ├── README.md
 ├── .gitignore
@@ -105,6 +109,16 @@ The prototype uses:
 - Signal-conditioning components
 - Prototype board and connection components
 
+The following diagram presents the experimental hardware configuration used in the prototype.
+
+<p align="center">
+  <img src="docs/hardware_setup.png" width="850" alt="NILM prototype hardware setup">
+</p>
+
+<p align="center">
+  <em>Experimental hardware configuration of the NILM prototype.</em>
+</p>
+
 In the current firmware:
 
 - `GPIO 34` is used for current acquisition
@@ -112,6 +126,18 @@ In the current firmware:
 - ADC resolution is configured to 12 bits
 
 Sensor calibration parameters are defined directly in the firmware and should be recalibrated when reproducing the prototype with different sensors or conditioning circuits.
+
+### Current Sensor Conditioning Circuit
+
+The SCT-013 current-sensor signal is conditioned before being connected to the ESP32 ADC. The conditioning stage includes the burden resistor, DC bias network, and filtering capacitors used by the prototype.
+
+<p align="center">
+  <img src="docs/current_sensor_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
+</p>
+
+<p align="center">
+  <em>Signal-conditioning circuit for the SCT-013 current sensor.</em>
+</p>
 
 ## NILM Dataset
 
@@ -240,6 +266,14 @@ The monitoring interface displays:
 - Recent measurements
 
 The dashboard uses **Chart.js** for data visualization.
+
+<p align="center">
+  <img src="docs/dashboard.png" width="900" alt="NILM real-time monitoring dashboard">
+</p>
+
+<p align="center">
+  <em>Web dashboard for real-time NILM monitoring and electrical measurements.</em>
+</p>
 
 ## Backend
 
