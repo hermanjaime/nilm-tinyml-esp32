@@ -112,7 +112,9 @@ The prototype uses:
 The following diagram presents the experimental hardware configuration used in the prototype.
 
 <p align="center">
-  <img src="docs/hardware\\\_setup.png" width="850" alt="NILM prototype hardware setup">
+
+&#x20; <img src="./docs/hardware\_setup.png" width="850" alt="NILM prototype hardware setup">
+
 </p>
 
 <p align="center">
@@ -132,7 +134,9 @@ Sensor calibration parameters are defined directly in the firmware and should be
 The SCT-013 current-sensor signal is conditioned before being connected to the ESP32 ADC. The conditioning stage includes the burden resistor, DC bias network, and filtering capacitors used by the prototype.
 
 <p align="center">
-  <img src="docs/current\\\_sensor\\\_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
+
+&#x20; <img src="./docs/current\_sensor\_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
+
 </p>
 
 <p align="center">
