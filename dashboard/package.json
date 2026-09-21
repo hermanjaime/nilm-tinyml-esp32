@@ -1,0 +1,24 @@
+{
+  "name": "nilm-esp32-dashboard",
+  "version": "1.0.0",
+  "description": "Node.js backend and web dashboard for the real-time NILM TinyML ESP32 project.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nilm",
+    "tinyml",
+    "esp32",
+    "energy-monitoring",
+    "mongodb",
+    "nodejs"
+  ],
+  "author": "Herman Cristiano Jaime",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.0",
+    "mongodb": "^6.0.0"
+  }
+}

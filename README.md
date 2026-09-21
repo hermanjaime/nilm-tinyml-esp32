@@ -8,21 +8,21 @@ The prototype acquires aggregated electrical signals, extracts statistical featu
 
 The system was developed as part of a Master's dissertation in Electrical Engineering and integrates:
 
-- Current and voltage acquisition
-- Statistical feature extraction
-- Multilabel appliance identification
-- Embedded MLP inference on ESP32
-- Real-time electrical measurements
-- Energy and cost estimation
-- REST communication with a Node.js backend
-- MongoDB data storage
-- Web-based monitoring dashboard
+* Current and voltage acquisition
+* Statistical feature extraction
+* Multilabel appliance identification
+* Embedded MLP inference on ESP32
+* Real-time electrical measurements
+* Energy and cost estimation
+* REST communication with a Node.js backend
+* MongoDB data storage
+* Web-based monitoring dashboard
 
 The experimental setup considers three residential appliances:
 
-- Fan
-- Blender
-- Hair dryer
+* Fan
+* Blender
+* Hair dryer
 
 All **8 possible operating states** are represented in the NILM dataset.
 
@@ -78,21 +78,21 @@ nilm-tinyml-esp32/
 │       └── dashboard.html
 │
 ├── dataset/
-│   ├── Dataset_NILM.csv
+│   ├── Dataset\_NILM.csv
 │   └── Program.cs
 │
 ├── firmware/
-│   ├── NILM_ESP32.ino
-│   └── nilm_model.h
+│   ├── NILM\_ESP32.ino
+│   └── nilm\_model.h
 │
 ├── models/
-│   └── train_dataset_nilm.py
+│   └── train\_dataset\_nilm.py
 │
 ├── docs/
 │   ├── dashboard.png
-│   ├── hardware_setup.png
-│   ├── current_sensor_circuit.png
-│   └── experimental_result_figures/
+│   ├── hardware\_setup.png
+│   ├── current\_sensor\_circuit.png
+│   └── experimental\_result\_figures/
 │
 ├── README.md
 ├── .gitignore
@@ -103,16 +103,16 @@ nilm-tinyml-esp32/
 
 The prototype uses:
 
-- ESP32 development board
-- SCT-013 current sensor
-- ZMPT101B voltage sensor
-- Signal-conditioning components
-- Prototype board and connection components
+* ESP32 development board
+* SCT-013 current sensor
+* ZMPT101B voltage sensor
+* Signal-conditioning components
+* Prototype board and connection components
 
 The following diagram presents the experimental hardware configuration used in the prototype.
 
 <p align="center">
-  <img src="docs/hardware_setup.png" width="850" alt="NILM prototype hardware setup">
+  <img src="docs/hardware\_setup.png" width="850" alt="NILM prototype hardware setup">
 </p>
 
 <p align="center">
@@ -121,9 +121,9 @@ The following diagram presents the experimental hardware configuration used in t
 
 In the current firmware:
 
-- `GPIO 34` is used for current acquisition
-- `GPIO 35` is used for voltage acquisition
-- ADC resolution is configured to 12 bits
+* `GPIO 34` is used for current acquisition
+* `GPIO 35` is used for voltage acquisition
+* ADC resolution is configured to 12 bits
 
 Sensor calibration parameters are defined directly in the firmware and should be recalibrated when reproducing the prototype with different sensors or conditioning circuits.
 
@@ -132,7 +132,7 @@ Sensor calibration parameters are defined directly in the firmware and should be
 The SCT-013 current-sensor signal is conditioned before being connected to the ESP32 ADC. The conditioning stage includes the burden resistor, DC bias network, and filtering capacitors used by the prototype.
 
 <p align="center">
-  <img src="docs/current_sensor_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
+  <img src="docs/current\_sensor\_circuit.png" width="850" alt="SCT-013 current sensor conditioning circuit">
 </p>
 
 <p align="center">
@@ -144,7 +144,7 @@ The SCT-013 current-sensor signal is conditioned before being connected to the E
 The dataset contains aggregated ADC measurements and three binary appliance labels:
 
 ```text
-adc,ventilador,liquidificador,secador
+adc,fan,blender,hair dryer
 ```
 
 The three labels represent the ON/OFF state of:
@@ -164,17 +164,17 @@ dataset/Program.cs
 The generated dataset is stored in:
 
 ```text
-dataset/Dataset_NILM.csv
+dataset/Dataset\_NILM.csv
 ```
 
 ## Signal Processing
 
 The NILM pipeline uses windows of:
 
-- **256 samples**
-- **128-sample step**
-- **50% overlap**
-- Sampling rate of approximately **8.2 kHz**
+* **256 samples**
+* **128-sample step**
+* **50% overlap**
+* Sampling rate of approximately **8.2 kHz**
 
 Nine statistical time-domain features are extracted from each window:
 
@@ -194,9 +194,9 @@ The features are standardized using `StandardScaler` before classification.
 
 The experimental pipeline evaluates three machine-learning algorithms:
 
-- Multilayer Perceptron (MLP)
-- Random Forest (RF)
-- Decision Tree (DT)
+* Multilayer Perceptron (MLP)
+* Random Forest (RF)
+* Decision Tree (DT)
 
 The MLP was selected for embedded deployment on the ESP32.
 
@@ -209,27 +209,27 @@ The embedded model included in this repository uses the following architecture:
 The three outputs correspond to:
 
 ```text
-[fan, blender, hair dryer]
+\[fan, blender, hair dryer]
 ```
 
 ### Embedded Model Results
 
 The embedded model header reports the following hold-out results:
 
-| Metric | Result |
-|---|---:|
-| Accuracy | 99.84% |
-| Macro F1-score | 0.9995 |
-| Hamming loss | 0.0005 |
-| Hold-out windows | 1,248 |
-| Classification errors | 2 |
+|Metric|Result|
+|-|-:|
+|Accuracy|99.84%|
+|Macro F1-score|0.9995|
+|Hamming loss|0.0005|
+|Hold-out windows|1,248|
+|Classification errors|2|
 
 ## Embedded Inference
 
 The trained model parameters and normalization coefficients are stored in:
 
 ```text
-firmware/nilm_model.h
+firmware/nilm\_model.h
 ```
 
 Inference is executed locally on the ESP32 using C/C++ operations, without requiring an external machine-learning runtime on the microcontroller.
@@ -240,13 +240,13 @@ The firmware also applies temporal smoothing, hysteresis, and debounce logic to 
 
 In addition to NILM classification, the ESP32 estimates:
 
-- RMS voltage
-- RMS current
-- Active power
-- Apparent power
-- Power factor
-- Accumulated energy
-- Estimated energy cost
+* RMS voltage
+* RMS current
+* Active power
+* Apparent power
+* Power factor
+* Accumulated energy
+* Estimated energy cost
 
 Electrical measurements and NILM results are transmitted to the backend as JSON data.
 
@@ -254,16 +254,16 @@ Electrical measurements and NILM results are transmitted to the backend as JSON 
 
 The monitoring interface displays:
 
-- Detected appliance states
-- MLP probabilities
-- Per-device power and current
-- Total voltage and current
-- Total active power
-- Power factor
-- Accumulated energy
-- Estimated cost
-- Historical charts
-- Recent measurements
+* Detected appliance states
+* MLP probabilities
+* Per-device power and current
+* Total voltage and current
+* Total active power
+* Power factor
+* Accumulated energy
+* Estimated cost
+* Historical charts
+* Recent measurements
 
 The dashboard uses **Chart.js** for data visualization.
 
@@ -279,10 +279,10 @@ The dashboard uses **Chart.js** for data visualization.
 
 The backend is implemented with:
 
-- Node.js
-- Express
-- MongoDB
-- CORS
+* Node.js
+* Express
+* MongoDB
+* CORS
 
 The API provides the following main endpoints:
 
@@ -302,7 +302,7 @@ mongodb://localhost:27017
 Database:
 
 ```text
-nilm_db
+nilm\_db
 ```
 
 Collection:
@@ -354,7 +354,7 @@ The timer implementation is intended for ESP32 Arduino Core 3.x.
 
 ## Running the Project
 
-### 1. Configure the backend
+### 1\. Configure the backend
 
 Make sure MongoDB is running locally.
 
@@ -370,29 +370,29 @@ The dashboard will be available at:
 http://localhost:3000/dashboard
 ```
 
-### 2. Configure the ESP32
+### 2\. Configure the ESP32
 
 Before compiling the firmware, configure:
 
 ```cpp
-#define WIFI_SSID     "YOUR_WIFI_SSID"
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
-#define SERVER_URL    "http://YOUR_SERVER_IP:3000/measure"
+#define WIFI\_SSID     "YOUR\_WIFI\_SSID"
+#define WIFI\_PASSWORD "YOUR\_WIFI\_PASSWORD"
+#define SERVER\_URL    "http://YOUR\_SERVER\_IP:3000/measure"
 ```
 
-Keep `nilm_model.h` in the same firmware project directory as `NILM_ESP32.ino`.
+Keep `nilm\_model.h` in the same firmware project directory as `NILM\_ESP32.ino`.
 
-### 3. Upload the firmware
+### 3\. Upload the firmware
 
 Compile and upload:
 
 ```text
-firmware/NILM_ESP32.ino
+firmware/NILM\_ESP32.ino
 ```
 
 to the ESP32.
 
-### 4. Start monitoring
+### 4\. Start monitoring
 
 With the ESP32 and backend connected to the same network, the device sends NILM classifications and electrical measurements to the server periodically.
 
@@ -403,28 +403,28 @@ Open the dashboard in a browser to monitor the system in real time.
 The Python training script is available at:
 
 ```text
-models/train_dataset_nilm.py
+models/train\_dataset\_nilm.py
 ```
 
-Before running the script, make sure `CSV_PATH` points to the correct location of:
+Before running the script, make sure `CSV\_PATH` points to the correct location of:
 
 ```text
-dataset/Dataset_NILM.csv
+dataset/Dataset\_NILM.csv
 ```
 
 The training script performs:
 
-- Dataset loading
-- Window segmentation
-- Statistical feature extraction
-- Temporal train/test split
-- Feature standardization
-- MLP training
-- Random Forest training
-- Decision Tree training
-- Model evaluation
+* Dataset loading
+* Window segmentation
+* Statistical feature extraction
+* Temporal train/test split
+* Feature standardization
+* MLP training
+* Random Forest training
+* Decision Tree training
+* Model evaluation
 
-> **Important:** `firmware/nilm_model.h` is the embedded model used by the current prototype. Do not overwrite it with a newly generated model header unless the generated interface and numerical results have been validated against the firmware.
+> \*\*Important:\*\* `firmware/nilm\_model.h` is the embedded model used by the current prototype. Do not overwrite it with a newly generated model header unless the generated interface and numerical results have been validated against the firmware.
 
 ## Security
 
@@ -433,9 +433,9 @@ Wi-Fi credentials, passwords, API tokens, and private server addresses should **
 The public firmware should use placeholders such as:
 
 ```cpp
-#define WIFI_SSID     "YOUR_WIFI_SSID"
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
-#define SERVER_URL    "http://YOUR_SERVER_IP:3000/measure"
+#define WIFI\_SSID     "YOUR\_WIFI\_SSID"
+#define WIFI\_PASSWORD "YOUR\_WIFI\_PASSWORD"
+#define SERVER\_URL    "http://YOUR\_SERVER\_IP:3000/measure"
 ```
 
 ## Academic Context
@@ -453,3 +453,4 @@ The complete bibliographic reference can be added here after the dissertation is
 ## License
 
 A software license has not yet been defined for this repository.
+
