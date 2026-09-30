@@ -30,38 +30,6 @@ All **8 possible operating states** are represented in the NILM dataset.
 
 ![System Architecture](docs/architecture.png)
 
-## Repository Structure
-
-```text
-nilm-tinyml-esp32/
-│
-├── dashboard/
-│   ├── server.js
-│   └── public/
-│       └── dashboard.html
-│
-├── dataset/
-│   ├── Dataset_NILM.csv
-│   └── Program.cs
-│
-├── firmware/
-│   ├── NILM_ESP32.ino
-│   └── nilm_model.h
-│
-├── models/
-│   └── train_dataset_nilm.py
-│
-├── docs/
-│   ├── dashboard.png
-│   ├── hardware_setup.png
-│   ├── current_sensor_circuit.png
-│   └── experimental_result_figures/
-│
-├── README.md
-├── .gitignore
-└── .gitattributes
-```
-
 ## Hardware
 
 The prototype uses:
