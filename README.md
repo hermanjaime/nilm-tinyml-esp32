@@ -344,4 +344,4 @@ The complete bibliographic reference can be added here after the dissertation is
 
 ## License
 
-A software license has not yet been defined for this repository.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
