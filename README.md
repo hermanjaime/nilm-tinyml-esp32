@@ -28,44 +28,7 @@ All **8 possible operating states** are represented in the NILM dataset.
 
 ## System Architecture
 
-```text
-                        ┌─────────────────────┐
-                        │  Residential Loads  │
-                        └──────────┬──────────┘
-                                   │
-                                   ▼
-                    ┌──────────────────────────┐
-                    │ Aggregated Measurement   │
-                    │ SCT-013 + ZMPT101B       │
-                    └─────────────┬────────────┘
-                                  │
-                                  ▼
-                    ┌──────────────────────────┐
-                    │          ESP32           │
-                    │                          │
-                    │ ADC Acquisition          │
-                    │ Feature Extraction       │
-                    │ Standardization          │
-                    │ Embedded MLP Inference   │
-                    │ Temporal Filtering       │
-                    │ Energy / Cost Estimation │
-                    └─────────────┬────────────┘
-                                  │ HTTP / JSON
-                                  ▼
-                    ┌──────────────────────────┐
-                    │      Node.js API         │
-                    └─────────────┬────────────┘
-                                  │
-                                  ▼
-                    ┌──────────────────────────┐
-                    │         MongoDB          │
-                    └─────────────┬────────────┘
-                                  │
-                                  ▼
-                    ┌──────────────────────────┐
-                    │      Web Dashboard       │
-                    └──────────────────────────┘
-```
+![System Architecture](docs/architecture.png)
 
 ## Repository Structure
 
