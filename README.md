@@ -242,33 +242,6 @@ Collection:
 measurements
 ```
 
-## Requirements
-
-### Machine Learning
-
-Recommended environment:
-
-```text
-Python 3.10
-NumPy 1.24
-pandas 2.0
-scikit-learn 1.3
-```
-
-Install the main Python dependencies with:
-
-```bash
-pip install numpy pandas scikit-learn
-```
-
-### Backend
-
-Install Node.js and MongoDB, then install the required packages:
-
-```bash
-npm install express mongodb cors
-```
-
 ### ESP32
 
 Use an ESP32-compatible Arduino environment.
@@ -356,18 +329,6 @@ The training script performs:
 - Model evaluation
 
 > **Important:** `firmware/nilm_model.h` is the embedded model used by the current prototype. Do not overwrite it with a newly generated model header unless the generated interface and numerical results have been validated against the firmware.
-
-## Security
-
-Wi-Fi credentials, passwords, API tokens, and private server addresses should **never be committed to the repository**.
-
-The public firmware should use placeholders such as:
-
-```cpp
-#define WIFI_SSID     "YOUR_WIFI_SSID"
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
-#define SERVER_URL    "http://YOUR_SERVER_IP:3000/measure"
-```
 
 ## Academic Context
 
